@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date
-from app.models.base import Base
+from app.core.database import Base
 
 
 class Lending(Base):
