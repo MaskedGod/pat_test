@@ -1,5 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
+from app.core.security import verify_password
 from app.models.reader import Reader
 from app.schemas.reader import ReaderCreate, ReaderResponse
 from passlib.context import CryptContext
@@ -44,6 +45,6 @@ class ReaderService:
         db: Session, email: str, password: str
     ) -> ReaderResponse | None:
         db_reader: ReaderResponse | None = ReaderService.get_reader_by_email(db, email)
-        if db_reader and pwd_context.verify(password, db_reader.hashed_password):
-            return ReaderResponse(**db_reader.__dict__)
+        if db_reader and verify_password(password, db_reader.hashed_password):
+            return db_reader
         return None
