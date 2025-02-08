@@ -15,9 +15,17 @@ class AuthorService:
 
     @staticmethod
     def get_authors(
-        db: Session, skip: int = 0, limit: int = 10
-    ) -> List[AuthorResponse]:
-        authors: List[Author] = db.query(Author).offset(skip).limit(limit).all()
+        db: Session,
+        skip: int = 0,
+        limit: int = 10,
+        name: str | None = None,
+    ) -> list[AuthorResponse]:
+        query = db.query(Author)
+
+        if name:
+            query = query.filter(Author.name.ilike(f"%{name}%"))
+
+        authors: List[Author] = query.offset(skip).limit(limit).all()
         return [AuthorResponse(**author.__dict__) for author in authors]
 
     @staticmethod

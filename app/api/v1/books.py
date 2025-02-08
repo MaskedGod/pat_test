@@ -19,9 +19,13 @@ def create_book(
 
 @router.get("/", response_model=list[BookResponse])
 def get_books(
-    skip: int = 0, limit: int = 10, db: Session = Depends(get_db)
+    skip: int = 0,
+    limit: int = 10,
+    title: str | None = None,
+    author_name: str | None = None,
+    db: Session = Depends(get_db),
 ) -> list[BookResponse]:
-    return BookService.get_books(db, skip, limit)
+    return BookService.get_books(db, skip, limit, title, author_name)
 
 
 @router.get("/{book_id}", response_model=BookResponse)

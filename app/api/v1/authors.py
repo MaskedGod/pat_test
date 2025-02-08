@@ -17,9 +17,12 @@ def create_author(
 
 @router.get("/", response_model=list[AuthorResponse])
 def get_authors(
-    skip: int = 0, limit: int = 10, db: Session = Depends(get_db)
+    skip: int = 0,
+    limit: int = 10,
+    name: str | None = None,
+    db: Session = Depends(get_db),
 ) -> List[AuthorResponse]:
-    return AuthorService.get_authors(db, skip, limit)
+    return AuthorService.get_authors(db, skip, limit, name)
 
 
 @router.get("/{author_id}", response_model=AuthorResponse)

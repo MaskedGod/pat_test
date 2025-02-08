@@ -10,4 +10,4 @@ class Reader(Base):
     email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    role = Column(String, default="reader")
+    role = Column(String, default="reader")  # Роль пользователя ("admin" или "reader")

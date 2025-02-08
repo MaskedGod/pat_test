@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from app.models.author import Author
 from app.models.book import Book
 from app.models.lending import Lending
 from app.schemas.book import BookCreate, BookUpdate, BookResponse
@@ -16,8 +17,24 @@ class BookService:
         return BookResponse(**db_book.__dict__)
 
     @staticmethod
-    def get_books(db: Session, skip: int = 0, limit: int = 10) -> list[BookResponse]:
-        books: List[Book] = db.query(Book).offset(skip).limit(limit).all()
+    def get_books(
+        db: Session,
+        skip: int = 0,
+        limit: int = 10,
+        title: str | None = None,
+        author_name: str | None = None,
+    ) -> list[BookResponse]:
+        query = db.query(Book)
+
+        if title:
+            query = query.filter(Book.title.ilike(f"%{title}%"))
+
+        if author_name:
+            query = query.join(Book.authors).filter(
+                Author.name.ilike(f"%{author_name}%")
+            )
+
+        books: List[Book] = query.offset(skip).limit(limit).all()
         return [BookResponse(**book.__dict__) for book in books]
 
     @staticmethod
