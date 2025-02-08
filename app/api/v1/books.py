@@ -34,7 +34,10 @@ def get_book_by_id(book_id: int, db: Session = Depends(get_db)) -> BookResponse:
 
 @router.put("/{book_id}", response_model=BookResponse)
 def update_book(
-    book_id: int, book_data: BookUpdate, db: Session = Depends(get_db)
+    book_id: int,
+    book_data: BookUpdate,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(get_current_admin),
 ) -> BookResponse:
     book: BookResponse | None = BookService.update_book(db, book_id, book_data)
     if not book:

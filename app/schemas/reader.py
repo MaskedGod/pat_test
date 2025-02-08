@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class ReaderCreate(BaseModel):
@@ -20,3 +20,8 @@ class ReaderResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ReaderUpdate(BaseModel):
+    name: str | None = None
+    email: EmailStr | None = None

@@ -1,6 +1,9 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from app.core.database import get_db
 from app.core.security import decode_access_token
+from app.schemas.reader import ReaderResponse
+from app.services.reader_service import ReaderService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -14,9 +17,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return payload["sub"]
 
 
-def get_current_admin(user: str = Depends(get_current_user)):
-    if user != "admin@example.com":  # Пример проверки роли администратора
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
-        )
-    return user
+def get_current_admin(current_user: str = Depends(get_current_user)):
+    db = next(get_db())
+    reader: ReaderResponse | None = ReaderService.get_reader_by_email(db, current_user)
+    if reader.role != "admin":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    return current_user

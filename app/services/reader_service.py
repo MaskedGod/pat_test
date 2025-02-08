@@ -2,7 +2,7 @@ from typing import List
 from sqlalchemy.orm import Session
 from app.core.security import verify_password
 from app.models.reader import Reader
-from app.schemas.reader import ReaderCreate, ReaderResponse
+from app.schemas.reader import ReaderCreate, ReaderResponse, ReaderUpdate
 from passlib.context import CryptContext
 
 
@@ -47,4 +47,19 @@ class ReaderService:
         db_reader: ReaderResponse | None = ReaderService.get_reader_by_email(db, email)
         if db_reader and verify_password(password, db_reader.hashed_password):
             return db_reader
+        return None
+
+    @staticmethod
+    def update_reader(
+        db: Session, reader_id: int, reader_data: ReaderUpdate
+    ) -> ReaderResponse | None:
+        db_reader: Reader | None = (
+            db.query(Reader).filter(Reader.id == reader_id).first()
+        )
+        if db_reader:
+            for key, value in reader_data.model_dump(exclude_unset=True).items():
+                setattr(db_reader, key, value)
+            db.commit()
+            db.refresh(db_reader)
+            return ReaderResponse(**db_reader.__dict__)
         return None
